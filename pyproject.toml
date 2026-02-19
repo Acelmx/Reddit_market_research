@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reddit-thread-extractor"
+version = "0.1.0"
+description = "Compact Reddit thread extractor with filtering and transcript output"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+reddit-thread-extractor = "reddit_thread_extractor.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
