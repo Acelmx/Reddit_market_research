@@ -19,39 +19,42 @@ pip install -e .
 ```
 
 ## Usage
-Single URL:
+Interactive single URL (easiest):
 ```bash
-reddit-thread-extractor \
+reddit
+```
+You will be prompted for a Reddit thread URL and a JSON file will be saved in `Output/`.
+
+Single URL (non-interactive):
+```bash
+reddit \
   --url "https://www.reddit.com/r/smallbusiness/comments/1r7e6fp/whats_the_best_boring_business_youve_seen_someone/" \
   --out-dir "/absolute/path/to/output" \
   --max-comments 500 \
-  --min-score 1 \
-  --format both
+  --min-score 1
 ```
 
 Multiple URLs from file:
 ```bash
-reddit-thread-extractor \
+reddit \
   --url-file urls.txt \
-  --out-dir "/absolute/path/to/output" \
-  --format thin_json
+  --out-dir "/absolute/path/to/output"
 ```
 
 ## CLI flags
 - `--url` single Reddit URL
 - `--url-file` file of URLs, one per line
-- `--out-dir` output directory (absolute path recommended)
+- `--out-dir` output directory (default: `Output`)
 - `--max-comments` maximum comments to keep
 - `--min-score` minimum score threshold
-- `--format` `thin_json`, `transcript`, or `both`
 - `--include-metadata` include filter metadata in thin JSON
 - `--min-comment-length` short-comment threshold (default 15)
 - `--high-score-keep-short` keep short comments when score is at least this value (default 20)
+- `--no-prompt` disable interactive URL prompt when no URL options are provided
 
 ## Outputs
-Per thread (post id `<post_id>`):
-- `<post_id>.thin.json`
-- `<post_id>.transcript.txt` (if requested)
+Per thread, one JSON file:
+- `r-<subreddit>__<title-slug>__<post_id>.json`
 
 `thin_json` structure:
 - `post`: `{ id, subreddit, title, selftext, author, score, num_comments, created_utc, permalink, url }`

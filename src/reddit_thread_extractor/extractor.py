@@ -217,19 +217,21 @@ def render_transcript(thread: dict[str, Any]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def save_outputs(thread: dict[str, Any], out_dir: Path, fmt: str = "both") -> list[Path]:
+def _slugify(value: str, max_len: int = 48) -> str:
+    cleaned = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return (cleaned[:max_len]).strip("-") or "untitled"
+
+
+def _json_filename(thread: dict[str, Any]) -> str:
+    post = thread.get("post", {})
+    post_id = str(post.get("id", "unknown")).strip() or "unknown"
+    subreddit = _slugify(str(post.get("subreddit", "")).strip() or "unknown", max_len=24)
+    title_slug = _slugify(str(post.get("title", "")), max_len=60)
+    return f"r-{subreddit}__{title_slug}__{post_id}.json"
+
+
+def save_outputs(thread: dict[str, Any], out_dir: Path) -> list[Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
-    post_id = thread.get("post", {}).get("id", "unknown")
-    created: list[Path] = []
-
-    if fmt in {"thin_json", "both"}:
-        json_path = out_dir / f"{post_id}.thin.json"
-        json_path.write_text(json.dumps(thread, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-        created.append(json_path)
-
-    if fmt in {"transcript", "both"}:
-        transcript_path = out_dir / f"{post_id}.transcript.txt"
-        transcript_path.write_text(render_transcript(thread), encoding="utf-8")
-        created.append(transcript_path)
-
-    return created
+    json_path = out_dir / _json_filename(thread)
+    json_path.write_text(json.dumps(thread, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return [json_path]

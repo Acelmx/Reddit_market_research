@@ -1,4 +1,6 @@
-from reddit_thread_extractor.extractor import extract_thread, render_transcript
+import json
+
+from reddit_thread_extractor.extractor import extract_thread, render_transcript, save_outputs
 
 
 def sample_payload():
@@ -103,3 +105,13 @@ def test_render_transcript_format():
     assert "A title" in txt
     assert "[10] (d=0) user1: Great idea" in txt
     assert "  [3] (d=1) user3: Nested comment with enough length" in txt
+
+
+def test_save_outputs_json_only_with_descriptive_filename(tmp_path):
+    thread = extract_thread(sample_payload(), min_score=1, min_length=10, high_score_keep_short=20)
+    paths = save_outputs(thread, out_dir=tmp_path)
+
+    assert len(paths) == 1
+    assert paths[0].name == "r-smallbusiness__a-title__abc123.json"
+    parsed = json.loads(paths[0].read_text(encoding="utf-8"))
+    assert parsed["post"]["id"] == "abc123"
